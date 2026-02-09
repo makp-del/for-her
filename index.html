@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For My Favorite Person 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-color: #ff9a9e;
+            --bg-color: #fecfef;
+            --card-bg: #ffffff;
+            --text-color: #555;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1, h2 { color: var(--primary-color); text-align: center; }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 50px;
+        }
+
+        /* Card Style for Sections */
+        section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        section:hover { transform: translateY(-3px); }
+
+        /* Buttons */
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #ff758c; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        /* Todo List Styles */
+        ul { list-style-type: none; padding: 0; }
+        li {
+            background: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed { text-decoration: line-through; color: #888; }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        .photo-grid img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        /* Prayer Section */
+        .prayer-box {
+            font-style: italic;
+            text-align: center;
+            line-height: 1.6;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>For You 🧸</h1>
+
+        <section id="todo-section">
+            <h2>📝 Daily Goals</h2>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <input type="text" id="taskInput" placeholder="What's the plan today?">
+                <button onclick="addTask()">Add</button>
+            </div>
+            <ul id="taskList"></ul>
+        </section>
+
+        <section id="rewards-section">
+            <h2>🎟️ Request Station</h2>
+            <p style="text-align: center; font-size: 0.9em; color: #888;">Resets every Monday!</p>
+            
+            <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                <div style="text-align: center;">
+                    <button id="bobaBtn" onclick="requestItem('boba', 2)">🧋 Boba Request</button>
+                    <p id="bobaStatus">Uses left: 2</p>
+                </div>
+                <div style="text-align: center;">
+                    <button id="favorBtn" onclick="requestItem('favor', 1)">✨ Girlfriend Favor</button>
+                    <p id="favorStatus">Uses left: 1</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>📸 Us</h2>
+            <div class="photo-grid">
+                <img src="https://via.placeholder.com/150/ff9a9e/ffffff?text=Photo+1" alt="Us 1">
+                <img src="https://via.placeholder.com/150/fecfef/ffffff?text=Photo+2" alt="Us 2">
+                <img src="https://via.placeholder.com/150/a18cd1/ffffff?text=Photo+3" alt="Us 3">
+            </div>
+        </section>
+
+        <section>
+            <h2>🌙 Good Night</h2>
+            <div class="prayer-box">
+                <p>"Dear God, thank you for this day. Watch over my love as she sleeps, give her peace and sweet dreams. Let her wake up refreshed and knowing she is loved beyond measure. Amen."</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        /* --- JAVASCRIPT LOGIC --- */
+
+        // --- TODO LIST LOGIC ---
+        function loadTasks() {
+            const saved = localStorage.getItem('myTasks');
+            if (saved) {
+                document.getElementById('taskList').innerHTML = saved;
+                // Re-attach event listeners for delete buttons
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.onclick = function() { this.parentElement.remove(); saveTasks(); };
+                });
+                // Re-attach click listeners for checking off items
+                document.querySelectorAll('li span').forEach(span => {
+                    span.onclick = function() { this.classList.toggle('completed'); saveTasks(); };
+                });
+            }
+        }
+
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value;
+            if (text === '') return;
+
+            const ul = document.getElementById('taskList');
+            const li = document.createElement('li');
+            
+            li.innerHTML = `
+                <span onclick="this.classList.toggle('completed'); saveTasks()">${text}</span>
+                <button class="delete-btn" style="background:#ff6b6b; padding: 5px 10px; font-size:0.8em;" onclick="this.parentElement.remove(); saveTasks()">✕</button>
+            `;
+            
+            ul.appendChild(li);
+            input.value = '';
+            saveTasks();
+        }
+
+        function saveTasks() {
+            localStorage.setItem('myTasks', document.getElementById('taskList').innerHTML);
+        }
+
+        // --- REQUEST SYSTEM LOGIC (Boba & Favors) ---
+        // We use a webhook to notify you. Replace the URL below!
+        const WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE"; 
+
+        function getWeekNumber(d) {
+            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+            var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+            return weekNo;
+        }
+
+        function loadRequests() {
+            updateButtonStatus('boba', 2);
+            updateButtonStatus('favor', 1);
+        }
+
+        function updateButtonStatus(type, limit) {
+            const currentWeek = getWeekNumber(new Date());
+            const key = `requests_${type}_${currentWeek}`;
+            const count = parseInt(localStorage.getItem(key) || 0);
+            
+            const btn = document.getElementById(`${type}Btn`);
+            const status = document.getElementById(`${type}Status`);
+            
+            const left = limit - count;
+            status.innerText = `Uses left: ${left}`;
+            
+            if (left <= 0) {
+                btn.disabled = true;
+                btn.innerText = "Used up for this week!";
+            }
+        }
+
+        function requestItem(type, limit) {
+            const currentWeek = getWeekNumber(new Date());
+            const key = `requests_${type}_${currentWeek}`;
+            let count = parseInt(localStorage.getItem(key) || 0);
+
+            if (count < limit) {
+                // 1. Send Alert
+                alert(`Yay! Request for ${type} sent! 💌`);
+                
+                // 2. Increment & Save
+                localStorage.setItem(key, count + 1);
+                updateButtonStatus(type, limit);
+
+                // 3. (Optional) Send Real Notification to You via Discord Webhook
+                if(WEBHOOK_URL !== "YOUR_DISCORD_WEBHOOK_URL_HERE") {
+                    fetch(WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ content: `🚨 New Request: She wants ${type}! (${count + 1}/${limit})` })
+                    });
+                }
+            }
+        }
+
+        // Initialize everything on load
+        loadTasks();
+        loadRequests();
+
+    </script>
+</body>
+</html>
