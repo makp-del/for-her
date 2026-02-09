@@ -34,7 +34,6 @@
             margin-bottom: 50px;
         }
 
-        /* Card Style for Sections */
         section {
             background: var(--card-bg);
             border-radius: 15px;
@@ -46,7 +45,6 @@
 
         section:hover { transform: translateY(-3px); }
 
-        /* Buttons */
         button {
             background-color: var(--primary-color);
             color: white;
@@ -61,7 +59,6 @@
         button:hover { background-color: #ff758c; }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
 
-        /* Todo List Styles */
         ul { list-style-type: none; padding: 0; }
         li {
             background: #f9f9f9;
@@ -81,7 +78,6 @@
             outline: none;
         }
 
-        /* Photo Grid */
         .photo-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
@@ -94,7 +90,6 @@
             border-radius: 10px;
         }
 
-        /* Prayer Section */
         .prayer-box {
             font-style: italic;
             text-align: center;
@@ -153,16 +148,14 @@
     <script>
         /* --- JAVASCRIPT LOGIC --- */
 
-        // --- TODO LIST LOGIC ---
+        // 1. TODO LIST LOGIC
         function loadTasks() {
             const saved = localStorage.getItem('myTasks');
             if (saved) {
                 document.getElementById('taskList').innerHTML = saved;
-                // Re-attach event listeners for delete buttons
                 document.querySelectorAll('.delete-btn').forEach(btn => {
                     btn.onclick = function() { this.parentElement.remove(); saveTasks(); };
                 });
-                // Re-attach click listeners for checking off items
                 document.querySelectorAll('li span').forEach(span => {
                     span.onclick = function() { this.classList.toggle('completed'); saveTasks(); };
                 });
@@ -191,9 +184,13 @@
             localStorage.setItem('myTasks', document.getElementById('taskList').innerHTML);
         }
 
-        // --- REQUEST SYSTEM LOGIC (Boba & Favors) ---
-        // We use a webhook to notify you. Replace the URL below!
-        const WEBHOOK_URL = "YOUR_DISCORD_WEBHOOK_URL_HERE"; 
+        // 2. REQUEST SYSTEM LOGIC (Integrated Webhooks)
+        
+        // Storing your webhooks securely in a constant
+        const WEBHOOKS = {
+            'boba': "https://discord.com/api/webhooks/1470528275976552499/PRO0V9h4N06YQ4iM13BjbctJJX5i6W1Yc3vt9hrPh3DubVsPzhgbB0PW_N9t_QEEHhKx",
+            'favor': "https://discord.com/api/webhooks/1470528292246523981/TR6XWB9LYDOgjKlQIZ-ExKKNUK0rtIoFtmBIVDAHIRMzTgpTwoEBwhi-nWLd7Hw5enqz"
+        };
 
         function getWeekNumber(d) {
             d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -234,16 +231,24 @@
                 // 1. Send Alert
                 alert(`Yay! Request for ${type} sent! 💌`);
                 
-                // 2. Increment & Save
+                // 2. Increment & Save Locally
                 localStorage.setItem(key, count + 1);
                 updateButtonStatus(type, limit);
 
-                // 3. (Optional) Send Real Notification to You via Discord Webhook
-                if(WEBHOOK_URL !== "YOUR_DISCORD_WEBHOOK_URL_HERE") {
-                    fetch(WEBHOOK_URL, {
+                // 3. Send Notification to the Correct Discord Channel
+                const webhookUrl = WEBHOOKS[type];
+                
+                if(webhookUrl) {
+                    fetch(webhookUrl, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ content: `🚨 New Request: She wants ${type}! (${count + 1}/${limit})` })
+                        body: JSON.stringify({ 
+                            content: `🚨 **ALERT:** She used a request!\nItem: **${type.toUpperCase()}**\nUses used: ${count + 1}/${limit}` 
+                        })
+                    }).then(response => {
+                        console.log("Discord notification sent!");
+                    }).catch(error => {
+                        console.error("Error sending notification:", error);
                     });
                 }
             }
