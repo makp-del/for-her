@@ -96,6 +96,15 @@
             line-height: 1.6;
             color: #777;
         }
+
+        /* Music Player Specific Styles */
+        .spotify-container {
+            text-align: center;
+        }
+        iframe {
+            border-radius: 12px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -110,6 +119,18 @@
                 <button onclick="addTask()">Add</button>
             </div>
             <ul id="taskList"></ul>
+        </section>
+
+        <section id="music-section">
+            <h2>🎧 Our Vibe</h2>
+            <div class="spotify-container">
+                <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/2v5N8aDqZ9y6X1w" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+                
+                <br>
+                <a href="https://open.spotify.com/playlist/2v5N8aDqZ9y6X1w" target="_blank" style="text-decoration: none;">
+                    <button style="background-color: #1DB954; font-size: 0.9em;">Open in Spotify App 💚</button>
+                </a>
+            </div>
         </section>
 
         <section id="rewards-section">
@@ -185,79 +206,10 @@
         }
 
         // 2. REQUEST SYSTEM LOGIC (Integrated Webhooks)
-        
-        // Storing your webhooks securely in a constant
         const WEBHOOKS = {
             'boba': "https://discord.com/api/webhooks/1470528275976552499/PRO0V9h4N06YQ4iM13BjbctJJX5i6W1Yc3vt9hrPh3DubVsPzhgbB0PW_N9t_QEEHhKx",
             'favor': "https://discord.com/api/webhooks/1470528292246523981/TR6XWB9LYDOgjKlQIZ-ExKKNUK0rtIoFtmBIVDAHIRMzTgpTwoEBwhi-nWLd7Hw5enqz"
         };
 
         function getWeekNumber(d) {
-            d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-            d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-            var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-            var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
-            return weekNo;
-        }
-
-        function loadRequests() {
-            updateButtonStatus('boba', 2);
-            updateButtonStatus('favor', 1);
-        }
-
-        function updateButtonStatus(type, limit) {
-            const currentWeek = getWeekNumber(new Date());
-            const key = `requests_${type}_${currentWeek}`;
-            const count = parseInt(localStorage.getItem(key) || 0);
-            
-            const btn = document.getElementById(`${type}Btn`);
-            const status = document.getElementById(`${type}Status`);
-            
-            const left = limit - count;
-            status.innerText = `Uses left: ${left}`;
-            
-            if (left <= 0) {
-                btn.disabled = true;
-                btn.innerText = "Used up for this week!";
-            }
-        }
-
-        function requestItem(type, limit) {
-            const currentWeek = getWeekNumber(new Date());
-            const key = `requests_${type}_${currentWeek}`;
-            let count = parseInt(localStorage.getItem(key) || 0);
-
-            if (count < limit) {
-                // 1. Send Alert
-                alert(`Yay! Request for ${type} sent! 💌`);
-                
-                // 2. Increment & Save Locally
-                localStorage.setItem(key, count + 1);
-                updateButtonStatus(type, limit);
-
-                // 3. Send Notification to the Correct Discord Channel
-                const webhookUrl = WEBHOOKS[type];
-                
-                if(webhookUrl) {
-                    fetch(webhookUrl, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ 
-                            content: `🚨 **ALERT:** She used a request!\nItem: **${type.toUpperCase()}**\nUses used: ${count + 1}/${limit}` 
-                        })
-                    }).then(response => {
-                        console.log("Discord notification sent!");
-                    }).catch(error => {
-                        console.error("Error sending notification:", error);
-                    });
-                }
-            }
-        }
-
-        // Initialize everything on load
-        loadTasks();
-        loadRequests();
-
-    </script>
-</body>
-</html>
+            d = new Date(Date.UTC
